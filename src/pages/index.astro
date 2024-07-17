@@ -35,7 +35,7 @@ var importObject: WebAssembly.Imports = {
 };
 
 // Loads and initializes the requested WASM file
-WebAssembly.instantiateStreaming(fetch('/astro-checkerboard.wasm'), importObject).then((res) => {
+WebAssembly.instantiateStreaming(fetch('/bin/astro-checkerboard.wasm'), importObject).then((res) => {
     const wasmMemoryArray = new Uint8Array(memory.buffer);
     const exports = res.instance.exports as {
 	getBoardBufferPtr: () => number;
