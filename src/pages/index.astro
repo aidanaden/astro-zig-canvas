@@ -1,0 +1,86 @@
+---
+
+---
+
+<html lang="en">
+<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>astro-zig-canvas</title>
+	</head>
+    <body>
+	<center>
+	    <canvas
+		id="board"
+		style={{ "image-rendering": "pixelated", "width": "50%"}}
+	    >
+	    </canvas>
+	</center>
+    </body>
+</html>
+<script>
+var memory = new WebAssembly.Memory({
+    // See build.zig for reasoning
+  initial: 2 /* pages */,
+  maximum: 2 /* pages */,
+});
+
+var importObject: WebAssembly.Imports = {
+    env: {
+        consoleLog: (arg: any) => console.log(arg), // Useful for debugging on zig's side
+	memory: memory,
+    },
+};
+
+// Loads and initializes the requested WASM file
+WebAssembly.instantiateStreaming(fetch('/astro-checkerboard.wasm'), importObject).then((res) => {
+    const wasmMemoryArray = new Uint8Array(memory.buffer);
+    const exports = res.instance.exports as {
+	getBoardBufferPtr: () => number;
+	getBoardSize: () => number;
+	colorBoard: (d_rvalue: number, d_gvalue: number, d_bvalue: number, l_rvalue: number, l_gvalue: number, l_bvalue: number) => void;
+    };
+
+    const boardSize = exports.getBoardSize();
+    const canvas: HTMLCanvasElement = document.getElementById("board") as HTMLCanvasElement;
+    canvas.height = boardSize;
+    canvas.width = boardSize;
+
+    const context = canvas.getContext("2d");
+    if (!context) {
+	console.error("no context found: ", context);
+	return;
+    }
+    const imageData = context.createImageData(canvas.width, canvas.height);
+    context.clearRect(0, 0, canvas.width, canvas.height);
+
+    const getDarkValue = () => {
+	return Math.floor(Math.random() * 100);
+    }
+
+    const getLightValue = () => {
+	return Math.floor(Math.random() * 127) + 127;
+    }
+
+    function drawBoard() {
+	if (!context) {
+	    console.error("no context found: ", context);
+	    return;
+	}
+	exports.colorBoard(getDarkValue(), getDarkValue(), getDarkValue(), getLightValue(), getLightValue(), getLightValue());
+	const bufferOffset = exports.getBoardBufferPtr();
+	const imageDataArray = wasmMemoryArray.slice(bufferOffset, bufferOffset + boardSize * boardSize * 4);
+	imageData.data.set(imageDataArray);
+	context.clearRect(0, 0, canvas.width, canvas.height);
+	context.putImageData(imageData, 0, 0);
+    }
+
+    drawBoard();
+    console.log({ memoryBuffer: memory.buffer });
+    setInterval(drawBoard, 200);
+});
+
+
+</script>
