@@ -1,47 +1,37 @@
-# Astro Starter Kit: Minimal
+## Build
 
-```sh
-npm create astro@latest -- --template minimal
+The default (and only) target for this example is `wasm32-freestanding-musl`.
+
+The latest zig version used to build this project is:
+
+```shell
+$ zig version
+0.13.0
 ```
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/minimal)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/minimal)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/minimal/devcontainer.json)
+To build the wasm module to `/public/bin/astro-checkerboard.wasm`, run:
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+```shell
+$ zig build -p public
 
-## 🚀 Project Structure
+$ ls ./public/bin
+astro-checkerboard.wasm
 
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+$ wc -c ./public/bin/astro-checkerboard.wasm
+555 ./public/bin/astro-checkerboard.wasm
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+Note: `build.zig` specifies various wasm-ld parameters. For example, it sets the initial memory size
+and maximum size to be 2 pages, where each page consists of 64kB. Use the `--verbose` flag to see the complete list of flags the build uses.
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+## Run
 
-Any static assets, like images, can be placed in the `public/` directory.
+Run preview in this repo's directory:
 
-## 🧞 Commands
+```shell
+pnpm run preview
+```
 
-All commands are run from the root of the project, from a terminal:
+Go to your favorite browser and type to the URL `localhost:4321` (or whatever URL is stated from running the `preview` command.
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+You should see the checkboard changing colors.
