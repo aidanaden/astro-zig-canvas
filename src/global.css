@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .pixelated-rendering {
+    image-rendering: pixelated;
+  }
+}
+
+@font-face {
+  font-family: "Minlo";
+  src: url("/fonts/Minlo-Regular.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Minlo";
+  src: url("/fonts/Minlo-Bold.woff2") format("woff2");
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+html {
+  @apply size-full bg-tokyo-bg font-mono text-tokyo-fg focus-visible:outline-none;
+}
+
+h1 {
+  @apply font-semibold text-tokyo-magenta;
+}
+
+h2 {
+  @apply text-tokyo-cyan;
+}
